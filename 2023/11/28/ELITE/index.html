@@ -1,0 +1,829 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/about.png">
+  <link rel="icon" href="/img/about.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="SummerRain">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="ELITE: Encoding Visual Concepts into Textual Embeddings for Customized Text-to-Image Generation 背景 customized 文本到图像的生成问题：由于用户可能会使用难以形容的、个人的一些概念去创造一些有想象力的样本（例：“柯基”）。通常需要从用户提供的少量图片集合去学习特定的概念，现存工作使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ELITE">
+<meta property="og:url" content="http://example.com/2023/11/28/ELITE/index.html">
+<meta property="og:site_name" content="SummerRain">
+<meta property="og:description" content="ELITE: Encoding Visual Concepts into Textual Embeddings for Customized Text-to-Image Generation 背景 customized 文本到图像的生成问题：由于用户可能会使用难以形容的、个人的一些概念去创造一些有想象力的样本（例：“柯基”）。通常需要从用户提供的少量图片集合去学习特定的概念，现存工作使用">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-28T11:24:51.000Z">
+<meta property="article:modified_time" content="2023-12-08T13:43:22.481Z">
+<meta property="article:author" content="SummerRain">
+<meta property="article:tag" content="Diffusion">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>ELITE - SummerRain</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.6","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>SummerRain</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="ELITE"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-11-28 19:24" pubdate>
+          2023年11月28日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          886 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          8 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">ELITE</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1
+id="elite-encoding-visual-concepts-into-textual-embeddings-for-customized-text-to-image-generation">ELITE:
+Encoding Visual Concepts into Textual Embeddings for Customized
+Text-to-Image Generation</h1>
+<h2 id="背景">背景</h2>
+<p>customized
+文本到图像的生成问题：<strong>由于用户可能会使用难以形容的、个人的一些概念去创造一些有想象力的样本</strong>（例：“柯基”）。通常需要从用户提供的少量图片集合去学习特定的概念，现存工作使用一种基于优化的方法来学习
+customized 概念，但是会带来过多的计算和内存负担。</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207203952840.png" srcset="/img/loading.gif" lazyload /></p>
+<p>基于GAN和VAE的方法不能很好的匹配用户的描述，大文生图模型也难以表达特定的或用户定义的概念。</p>
+<h2 id="贡献">贡献</h2>
+<p>为快速准确的 customized
+文本到图像生成提出基于学习的编码器ELITE，由全局-局部映射网络组成，直接将视觉概念编码为文本嵌入。在将学习到的概念编辑到一个新的场景中时有较好的灵活性，同时保留图像特有的细节。</p>
+<p>全局映射网络将给定图像的层级特征投射到文本的 word embedding
+空间中的多个“新”的单词中（例：一个主词表示可编辑的概念，以及其他辅助词来排除不相关的干扰）；局部映射网络将编码后的
+patch 特征注入到交叉注意力层以提供遗漏的细节。</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204007671.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="方法">方法</h2>
+<h3 id="预备">预备</h3>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204021828.png" srcset="/img/loading.gif" lazyload /></p>
+<p>使用 Stable diffusion
+作为文生图模型：首先训练一个autoencoder，encoder <span
+class="math inline">\(z=\varepsilon(x)\)</span>
+将一张图像映射到低维空间，同时decoder <span
+class="math inline">\(D(\varepsilon(x))\approx x\)</span>
+将隐编码还原为一张图像;然后在隐空间上训练条件扩散模型 <span
+class="math inline">\(\epsilon_\theta(\cdot)\)</span> ，基于条件 <span
+class="math inline">\(y\)</span> 生成隐编码。使用均方误差来训练： <span
+class="math display">\[
+L_{LDM}=\mathbb E_{z\sim\varepsilon(x),y,\epsilon\sim\mathcal
+N(0,1),t}\big[\left\|\epsilon-\epsilon_\theta(z_t,t,\tau_\theta(y))\right\|_2^2\big]
+\]</span> <span class="math inline">\(\tau_\theta(\cdot)\)</span>
+表示CLIP text-encoder。推理时，高斯噪声 <span
+class="math inline">\(z_T\)</span> 逐渐去噪为 <span
+class="math inline">\(z_0\)</span> ,然后最终的图像通过decoder得到 <span
+class="math inline">\(x&#39;=\mathcal D(z_0)\)</span></p>
+<p><strong>交叉注意力</strong> 为了在生成过程中利用文本信息</p>
+<blockquote>
+<p><span class="math display">\[
+Attention(Q,K,V)=Softmax(\frac{QK^T}{\sqrt{d&#39;}})V
+\]</span></p>
+<p><span class="math inline">\(Q=W_Q\cdot f,K=W_K\cdot
+\tau_\theta(y),V=W_V\cdot\tau_\theta(y)\)</span> ，<span
+class="math inline">\(f\)</span> 为隐图像特征，<span
+class="math inline">\(\tau_\theta(y)\)</span> 为文本特征，<span
+class="math inline">\(d&#39;\)</span>
+为key和query的输出维度，隐图像特征通过注意力块更新。</p>
+</blockquote>
+<hr />
+<h3 id="全局映射网络"><strong>全局映射网络</strong></h3>
+<p>使用CLIP图像编码器 <span
+class="math inline">\(\psi_\theta(\cdot)\)</span>
+作为特征提取器，全局映射网络 <span
+class="math inline">\(M^g(\cdot)\)</span>特征投影到CLIP文本编码器的文本词嵌入
+<span class="math inline">\(v\)</span> : <span class="math display">\[
+v=M^g\circ\psi_\theta(x)
+\]</span> <span class="math inline">\(v\in \mathbb R^{N\times
+d}\)</span>，<span class="math inline">\(N\)</span> 为单词数，<span
+class="math inline">\(d\)</span>
+为词向量的维度，对特征使用全局平均池化来获得词嵌入。由于一张图像会有主体和其他不相关元素，编码为单个单词会损失主体的可编辑性，于是分别学习主词和辅助词：从CLIP最深层特征学到主要概念（主体），从其他层学到的辅助词描述其他不相关元素。从CLIP图像编码器中选择
+<span class="math inline">\(N\)</span> 层，每一层 <span
+class="math inline">\(\psi_\theta^{L_i}(\cdot)\)</span>
+独立的学习一个单词 <span class="math inline">\(w_i\)</span></p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204032657.png" srcset="/img/loading.gif" lazyload /></p>
+<p>训练目标： <span class="math display">\[
+L_{global}=L_{LDM}+\lambda_{global}\left\|v\right\|_1
+\]</span> 训练时随机从CLIP ImageNet
+templates采样一个文本作为文本输入，key 和 value 分别通过 <span
+class="math inline">\(M^g(\cdot)\)</span> 微调。<span
+class="math inline">\(K^g=W_K^g\cdot\tau_\theta(y),V^g=W_V^g\cdot\tau_\theta(y)\)</span></p>
+<hr />
+<h3 id="局部映射网络"><strong>局部映射网络</strong></h3>
+<p>局部映射网络 <span class="math inline">\(M^l(\cdot)\)</span>
+将多层CLIP特征编码到文本特征空间中（文本编码器的输出空间）。 <span
+class="math display">\[
+e=M^l\circ\psi_\theta(x*m)
+\]</span> <span class="math inline">\(m\)</span>
+是对象的mask，用来回避背景中不需要的细节，<span
+class="math inline">\(e\in\mathbb R^{p\times p\times d}\)</span>
+保持空间结构，<span class="math inline">\(p\)</span> 为特征的size。<span
+class="math inline">\(e\)</span>
+的每个像素主要集中于给定图像的每个patch的局部细节，然后将得到的文本嵌入注入到交叉注意力层
+<span
+class="math inline">\(Attention(Q,K^l,V^l),K^l=W_K^l\cdot(e*m),V^l=W_V^l\cdot(e*m)\)</span>，与全局部分融合以改进局部细节:
+<span class="math display">\[
+Out=Attention(Q,K^g,V^g)+\lambda Attention(Q,K^l,V^l)
+\]</span> 为了强调目标区域，将得到的注意力图 <span
+class="math inline">\(Q{K^l}^T\)</span> 通过 <span
+class="math inline">\(Q{K^g}^T\)</span> 重新加权。</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204040735.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204047752.png" srcset="/img/loading.gif" lazyload /></p>
+<p>训练目标： <span class="math display">\[
+L_{local}=L_{LDM}+\lambda_{local}\left\|V^l\right\|_1
+\]</span></p>
+<hr />
+<h2 id="实验">实验</h2>
+<p>使用OpenImage的测试集进行训练，主体mask通过预训练的分割模型得到。映射网络使用3层MLP，选择{24，4，8，12，16}层的CLIP特征，采样器使用LMS采样器。</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204055309.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204103826.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204110051.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204126287.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204133882.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="局限">局限</h2>
+<p>不能处理涉及文本字符的图片：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204146549.png" srcset="/img/loading.gif" lazyload /></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Diffusion/" class="print-no-link">#Diffusion</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>ELITE</div>
+      <div>http://example.com/2023/11/28/ELITE/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>SummerRain</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年11月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/12/05/Diffusion%20GAN/" title="Diffusion GAN">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Diffusion GAN</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/11/13/Understanding%20diffusion/" title="Understanding Diﬀusion Models">
+                        <span class="hidden-mobile">Understanding Diﬀusion Models</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

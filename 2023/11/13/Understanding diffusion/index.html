@@ -1,0 +1,1042 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/about.png">
+  <link rel="icon" href="/img/about.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="SummerRain">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Understanding Diﬀusion Models: A Uniﬁed Perspective ELBO 目标：学习一个模型去最大化 \(p(x)\) 的似然 法一：\(p(x)&#x3D;\int p(x,z)dz\) 法二：\(p(x)&#x3D;\frac{p(x,z)}{p(z|x)}\) 代理目标：最大化ELBO \[ \log{p(x)} \ge \mathbb E_{q_\p">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Understanding Diﬀusion Models">
+<meta property="og:url" content="http://example.com/2023/11/13/Understanding%20diffusion/index.html">
+<meta property="og:site_name" content="SummerRain">
+<meta property="og:description" content="Understanding Diﬀusion Models: A Uniﬁed Perspective ELBO 目标：学习一个模型去最大化 \(p(x)\) 的似然 法一：\(p(x)&#x3D;\int p(x,z)dz\) 法二：\(p(x)&#x3D;\frac{p(x,z)}{p(z|x)}\) 代理目标：最大化ELBO \[ \log{p(x)} \ge \mathbb E_{q_\p">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-13T15:24:51.000Z">
+<meta property="article:modified_time" content="2023-12-08T13:43:22.482Z">
+<meta property="article:author" content="SummerRain">
+<meta property="article:tag" content="Diffusion">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Understanding Diﬀusion Models - SummerRain</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.6","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>SummerRain</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Understanding Diﬀusion Models"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-11-13 23:24" pubdate>
+          2023年11月13日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          16 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Understanding Diﬀusion Models</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1
+id="understanding-diﬀusion-models-a-uniﬁed-perspective">Understanding
+Diﬀusion Models: A Uniﬁed Perspective</h1>
+<h2 id="elbo">ELBO</h2>
+<p>目标：学习一个模型去最大化 <span class="math inline">\(p(x)\)</span>
+的似然</p>
+<p>法一：<span class="math inline">\(p(x)=\int p(x,z)dz\)</span></p>
+<p>法二：<span
+class="math inline">\(p(x)=\frac{p(x,z)}{p(z|x)}\)</span></p>
+<p>代理目标：<strong>最大化ELBO</strong></p>
+<p><span class="math display">\[
+\log{p(x)} \ge \mathbb
+E_{q_\phi(z|x)}\Big[\log{\frac{p(x,z)}{q_\phi(z|x)}}\Big]
+\]</span></p>
+<p>why？</p>
+<p>使用法一证明：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204336825.png" srcset="/img/loading.gif" lazyload /></p>
+<p>并不能告诉我们太多幕后实际情况的有用信息，而且这个证明并没有直观的给出究竟为什么ELBO实际上是证据的下限</p>
+<p>于是使用法二证明：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204345263.png" srcset="/img/loading.gif" lazyload /></p>
+<p>因此证据就等于ELBO加上KL散度</p>
+<p><span class="math inline">\(\log{p(x)}\)</span> 对于 <span
+class="math inline">\(\phi\)</span> 总是一个常数，因此，<span
+style="background-color: #ff666680">最大化ELBO项就相当于最小化KL散度项</span></p>
+<h2 id="vae">VAE</h2>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204353735.png" srcset="/img/loading.gif" lazyload /></p>
+<p>输入数据经过中间的bottleneck表示步骤后被训练来预测它本身</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204400769.png" srcset="/img/loading.gif" lazyload /></p>
+<p><strong>encoder</strong>：学习中间的bottleneck分布 <span
+class="math inline">\(q_\phi(z|x)\)</span>
+将输入转换为可能的潜在分布</p>
+<p><strong>decoder</strong>: 学习确定的函数 <span
+class="math inline">\(p_\theta(x|z)\)</span> 将输入的潜在向量 <span
+class="math inline">\(z\)</span> 转换为观测 <span
+class="math inline">\(x\)</span></p>
+<p>第一项衡量变分分布的decoder的重建似然，保证学到的分布可以建模有效的可以重新生成原始数据的潜在变量；第二项衡量学习到的变分分布和潜在变量的先验信念有多相似，最小化该项可以避免学到的分布坍塌为Dirac
+delta函数</p>
+<p><u>那么最大化ELBO等价于最大化第一项、最小化第二项</u></p>
+<p>VAE的encoder通常通过对数协方差建模一个多元高斯，先验器通常被选择为一个标准高斯：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204408488.png" srcset="/img/loading.gif" lazyload /></p>
+<p>KL散度项在分析上可以被计算，重建项可以使用蒙特卡罗方法近似，于是目标变为：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204416402.png" srcset="/img/loading.gif" lazyload /></p>
+<p>由于每个 <span class="math inline">\(z\)</span>
+被随机采样，通常不可微，因此通过重新参数化技巧解决：重写随机变量为一个确定的噪声变量的函数。于是每个
+<span class="math inline">\(z\)</span> 可以被输入为 <span
+class="math inline">\(x\)</span> 的确定函数以及辅助噪声变量 <span
+class="math inline">\(\epsilon\)</span> 所计算：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204423652.png" srcset="/img/loading.gif" lazyload /></p>
+<p>训练VAE后，可以直接从隐空间 <span class="math inline">\(p(z)\)</span>
+采样，然后通过decoder生成新数据。当 <span
+class="math inline">\(z\)</span> 的维度小于 <span
+class="math inline">\(x\)</span>
+时，或许可以学习到重要、有趣的表示，此外，当语义上有意义的隐空间被学习，隐向量可以在通过decoder之前被编辑来控制数据的生成</p>
+<h2 id="hierarchical-variational-autoencoders">Hierarchical Variational
+Autoencoders</h2>
+<p>一般的HVAE有T个层级，每个隐变量都可以以前面的隐变量为条件</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204430964.png" srcset="/img/loading.gif" lazyload /></p>
+<p>decoding每个 <span class="math inline">\(z_t\)</span> 都只以前面的
+<span class="math inline">\(z_{t+1}\)</span>
+为条件（可以理解为递归式的VAE），联合分布和后验器定义为：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204438090.png" srcset="/img/loading.gif" lazyload /></p>
+<p>扩展ELBO为：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204445749.png" srcset="/img/loading.gif" lazyload /></p>
+<p>代入联合分布、后验器：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204453280.png" srcset="/img/loading.gif" lazyload /></p>
+<p>变分扩散模型可以更进一步将这个目标分解为可解释的组分</p>
+<h2 id="variational-diffusion-models">Variational Diffusion Models</h2>
+<p>三个关键约束：</p>
+<ul>
+<li><p>隐变量维度与数据维度相同</p></li>
+<li><p>每一步的隐变量编码器为一个预定义的线性高斯模型，不需要学习</p></li>
+<li><p>最后的时间步T时刻隐变量为一个标准高斯</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204500602.png" srcset="/img/loading.gif" lazyload /></p></li>
+</ul>
+<p>改写后验器：</p>
+<p><span class="math display">\[
+q(x_{1:T}|x_0)=\prod_{t=1}^{T}q(x_t|x_{t-1})\tag {30}
+\]</span></p>
+<p>encoder转移：</p>
+<p><span class="math display">\[
+q(x_t|x_{t-1})=\mathcal N(x_t;\sqrt{\alpha_t}x_{t-1},(1-\alpha_t)\mathbf
+I)\tag{31}
+\]</span></p>
+<p>改写HVAE的联合分布：</p>
+<p><span class="math display">\[
+p(x_{0:T})=p(x_T)\prod_{t=1}^Tp_\theta(x_{t-1|x_t})\tag{32}
+\]</span></p>
+<p><span class="math display">\[
+p(x_T)=\mathcal N(x_T;0,\mathbf I)\tag{33}
+\]</span></p>
+<blockquote>
+<p>逐渐地添加噪声破坏图像，直至其最终与纯高斯噪声完全相同</p>
+</blockquote>
+<p>VDM的采样过程变为：从<span class="math inline">\(p(x_T)\)</span>
+采样一个高斯噪声，然后逐渐运行去噪转移 <span
+class="math inline">\(p_\theta(x_{t-1}|x_t)\)</span> 生成新的 <span
+class="math inline">\(x_0\)</span>。通过最大化ELBO来优化VDM：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204510858.png" srcset="/img/loading.gif" lazyload /></p>
+<blockquote>
+<p><strong>重建项</strong>预测给定第一步隐变量后原始数据的对数似然；<strong>先验匹配项</strong>不需要被优化，假设一个足够大的T，最后的分布为高斯分布，这项实际上为0；<strong>一致项</strong>使得一张噪声图的去噪步应该匹配一张干净图的加噪步：</p>
+</blockquote>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204518184.png" srcset="/img/loading.gif" lazyload /></p>
+<p>上面的结果是可能是次优解，由于一致项作为一个期望在每个时间步有两个随机变量，使用蒙特卡洛估计可能会有较高的方差。改进方案：<span
+style="background-color: #ff666680">将encoder转移改写为 <span
+class="math"><span
+class="math inline">\(q(x_t|x_{t-1})=q(x_t|x_{t-1},x_0)\)</span></span>
+，</span>根据贝叶斯规则继续改写：</p>
+<p><span class="math display">\[
+q(x_t|x_{t-1},x_0)=\frac{q(x_{t-1}|x_t,x_0)q(x_t|x_0)}{q(x_{t-1}|x_0)}\tag{46}
+\]</span></p>
+<p>重新进行推导ELBO：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204525454.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204532467.png" srcset="/img/loading.gif" lazyload /></p>
+<blockquote>
+<p><strong>重建项</strong>与普通的VAE相似，可以使用蒙特卡洛估计来近似；<strong>先验匹配项</strong>表示最终的噪声分布与标准高斯先验分布有多接近，同样的不需要训练，根据假设同样趋于0；<strong>去噪匹配项</strong>中的
+<span class="math inline">\(q(x_{t-1}|x_t,x_0)\)</span>
+转移步可以看作ground-truth信号，定义了有噪声的图像 <span
+class="math inline">\(x_t\)</span>
+应该如何去噪，并获得最后的完全去噪的图像 <span
+class="math inline">\(x_0\)</span>  应该是什么</p>
+</blockquote>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204539891.png" srcset="/img/loading.gif" lazyload /></p>
+<p><strong>去噪匹配项</strong>中的KL散度难以计算，但是可以使用高斯转移的假设进行优化，根据贝叶斯规则：</p>
+<p><span class="math display">\[
+q(x_{t-1}|x_t,x_0)=\frac{q(x_t|x_{t-1},x_0)q(x_{t-1}|x_0)}{q(x_t|x_0)}
+\]</span></p>
+<p><span class="math inline">\(q(x_t|x_{t-1})=q(x_t|x_{t-1})=\mathcal
+N(x_t;\sqrt{\alpha_t}x_{t-1},(1-\alpha_t)\mathbf I)\)</span>
+，根据重新参数化技巧，重写采样 <span class="math inline">\(x_t\sim
+q(x_t|x_{t-1})\)</span> :</p>
+<p><span class="math display">\[
+x_t=\sqrt \alpha_tx_{t-1}+\sqrt{1-\alpha_t}\epsilon\tag{59}
+\]</span></p>
+<p><span class="math display">\[
+x_{t-1}=\sqrt \alpha_{t-1}x_{t-2}+\sqrt{1-\alpha_{t-1}}\epsilon\tag{60}
+\]</span></p>
+<p>于是：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204547855.png" srcset="/img/loading.gif" lazyload /></p>
+<p>代入得：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204554664.png" srcset="/img/loading.gif" lazyload /></p>
+<p>将方差重写，<span
+class="math inline">\(\Sigma_q(t)=\sigma_q^2(t)\mathbf I\)</span>
+,则：</p>
+<p><span class="math display">\[
+\sigma_q^2(t)=\frac{(1-\alpha_t)(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}\tag{85}
+\]</span></p>
+<p>为了匹配近似ground-truth去噪转移步<span style="color: #eb52f7"> <span
+class="math"><span
+class="math inline">\(q(x_{t-1}|x_t,x_0)\)</span></span>
+</span>，将近似<span style="color: #4eb31c"> <span class="math"><span
+class="math inline">\(p_\theta(x_{t-1}|x_{t})\)</span></span>
+</span>也建模为高斯分布。由于 <span
+class="math inline">\(\alpha\)</span>
+项已知，于是近似的方差就可以是<span style="color: #eb52f7"> <span
+class="math"><span
+class="math inline">\(\Sigma_q(t)=\sigma_q^2(t)\mathbf I\)</span></span>
+</span>.因此必须参数化它的均值<span style="color: #4eb31c"> <span
+class="math"><span
+class="math inline">\(\mu_\theta(x_t,t)\)</span></span> </span>.</p>
+<p>两个高斯分布之间的KL散度：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204601419.png" srcset="/img/loading.gif" lazyload /></p>
+<p><span class="math display">\[
+D_{KL}(\mathcal N(x;\mu_x,\Sigma_x)\parallel\mathcal
+N(y;\mu_y,\Sigma_y))=\frac{1}{2}\bigg[\log\frac{|\Sigma_y|}{|\Sigma_x|}-d+tr(\Sigma_y^{-1}\Sigma_x)+(\mu_y-\mu_x)^T\Sigma_y^{-1}(\mu_y-\mu_x)\bigg]\tag{86}
+\]</span></p>
+<p>那么<strong>去噪匹配项</strong>中的KL散度可以通过最小化这两个分布的<span
+style="background-color: #ff666680">均值</span>差异来减小：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204609882.png" srcset="/img/loading.gif" lazyload /></p>
+<p><span class="math display">\[
+\mu_q(x_t,x_0)=\frac{\sqrt\alpha_t(1-\bar\alpha_{t-1})x_t+\sqrt{\bar\alpha_{t-1}}(1-\alpha_t)x_0}{1-\bar\alpha_t}\tag{93}
+\]</span></p>
+<p><span class="math display">\[
+\mu_\theta(x_t,t)=\frac{\sqrt\alpha_t(1-\bar\alpha_{t-1})x_t+\sqrt{\bar\alpha_{t-1}}(1-\alpha_t)\hat
+x_\theta(x_t,t)}{1-\bar\alpha_t}\tag{94}
+\]</span></p>
+<p>因此优化问题简化为：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204624272.png" srcset="/img/loading.gif" lazyload /></p>
+<p>因此优化VDM归结起来就是学习一个NN从任意噪声版本的图像中预测出原始图像。此外，最小化所有噪声水平上公式<span
+class="math inline">\((58)\)</span>
+中的求和项可以通过最小化所有时间步的期望来近似：</p>
+<p><span class="math display">\[
+\underset{\theta}{arg\ min}\ \mathbb E_{t\sim U{2,T}}\big[\mathbb
+E_{q(x_t|x_0)}[D_{KL}(q(x_{t-1}|x_t,x_0)\parallel
+p_\theta(x_{t-1}|x_t))]\big]\tag{100}
+\]</span></p>
+<p>可以在每个时间步使用随机采样来优化。</p>
+<h2 id="学习噪声参数">学习噪声参数</h2>
+<p>如何学习噪声参数？一种方法是使用一个NN <span
+class="math inline">\(\hat\alpha_\eta(t)\)</span> 来建模 <span
+class="math inline">\(\alpha_t\)</span> ，但是很低效。解决方案：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204631290.png" srcset="/img/loading.gif" lazyload /></p>
+<p>由于 <span class="math inline">\(q(x_t|x_0)\sim \mathcal
+N(x_t;\sqrt{\bar\alpha_t}x_0,(1-\bar\alpha_t)\mathbf I)\)</span>
+,根据信噪比定义 <span
+class="math inline">\(\mathrm{SNR}=\frac{\mu^2}{\sigma^2}\)</span>
+,，每个时间步的SNR为：</p>
+<p><span class="math display">\[
+\mathrm{SNR}(t)=\frac{\bar\alpha_t}{1-\bar\alpha_t}\tag{109}
+\]</span></p>
+<p><span class="math display">\[
+\frac{1}{2\sigma_q^2(t)}\frac{\bar\alpha_{t-1}(1-\alpha_t)^2}{(1-\bar\alpha_t)^2}\Big[\left\|\hat
+x_\theta(x_t,t)-x_0\right\|_2^2\Big]=\frac{1}{2}(\mathrm
+{SNR}(t-1)-\mathrm{SNR}(t))\Big[\left\|\hat
+x_\theta(x_t,t)-x_0\right\|_2^2\Big]\tag{110}
+\]</span></p>
+<p>SNR表示原始信号与噪声之间的比值，在扩散中我们需要SNR随着t的增加而减小，于是可以表示为：</p>
+<p><span class="math display">\[
+\mathrm{SNR}(t)=exp(-\omega_\eta(t))\tag{111}
+\]</span></p>
+<p><span class="math inline">\(\omega_\eta(t)\)</span>
+是一个单调递增的NN，于是结合以上的式子就可以优雅的表示 <span
+class="math inline">\(\bar\alpha_t\)</span> 以及 <span
+class="math inline">\(1-\bar\alpha_t\)</span> 的值：</p>
+<p><span class="math display">\[
+\frac{\bar\alpha_t}{1-\bar\alpha_t}=\exp(-\omega_\eta(t))\tag{112}
+\]</span></p>
+<p><span class="math display">\[
+\therefore \bar\alpha_t=sigmoid(-\omega_\eta(t))\tag{113}
+\]</span></p>
+<p><span class="math display">\[
+\therefore 1-\bar\alpha_t=sigmoid(\omega_\eta(t))\tag{114}
+\]</span></p>
+<h2 id="三种等价形式">三种等价形式</h2>
+<h3 id="预测噪声">预测噪声</h3>
+<p>根据公式 <span class="math inline">\((69)\)</span> ：</p>
+<p><span class="math display">\[
+x_0=\frac{x_t-\sqrt{1-\bar\alpha_t}\epsilon_0}{\sqrt{\bar\alpha_t}}\tag{115}
+\]</span></p>
+<p>代入到均值<span style="color: #eb52f7"> <span class="math"><span
+class="math inline">\(\mu_q(x_t,x_0)\)</span></span> </span>：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204640841.png" srcset="/img/loading.gif" lazyload /></p>
+<p>于是近似的均值<span style="color: #4eb31c"> <span class="math"><span
+class="math inline">\(\mu_\theta(x_t,t)\)</span></span> </span>：</p>
+<p><span class="math display">\[
+\mu_\theta(x_t,t)=\frac{1}{\sqrt\alpha_t}x_t-\frac{1-\alpha_t}{\sqrt{1-\bar\alpha_t}\sqrt\alpha_t}\hat\epsilon_\theta(x_t,t)\tag{125}
+\]</span></p>
+<p>那么优化项就变为：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204649500.png" srcset="/img/loading.gif" lazyload /></p>
+<p>因此，通过预测原始图像 <span class="math inline">\(x_0\)</span>
+学习VDM等价于去学习预测噪声，另外，一些工作也发现预测噪声会有更好的表现。</p>
+<h3 id="预测分数">预测分数</h3>
+<p><strong><span
+style="color: #ff2020">Tweedie公式</span></strong>：<u>给定从指数族分布中的样本的真实平均值可以通过样本的最大似然估计（经验平均值）加上一些涉及估计分数的校正项得到</u></p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204656451.png" srcset="/img/loading.gif" lazyload /></p>
+<p><span class="math display">\[
+\mathbb E[\mu_z|z]=z+\Sigma_z\nabla_z\log p(z)
+\]</span></p>
+<p>在VDM里面，通常被用来减少样本的偏差，如果观测样本都在潜在分布的一端，那么负的分数将会变大并且校正原始的样本的最大似然估计为正确的均值。我们使用它来预测给定后验器样本后的
+<span class="math inline">\(x_t\)</span> 的真实均值，我们知道：<span
+class="math inline">\(q(x_t|x_0)=\mathcal
+N(x_t;\sqrt{\bar\alpha_t}x_0,(1-\bar\alpha_t)\mathbf I)\)</span>
+，于是根据 Tweedie公式：</p>
+<p><span class="math display">\[
+\mathbb E[\mu_{x_t}|x_t]=x_t+(1-\bar\alpha_t)\nabla_{x_t}\log
+p(x_t)\tag{131}
+\]</span></p>
+<p>于是：</p>
+<p><span class="math display">\[
+\sqrt{\bar\alpha_t}x_0=x_t+(1-\bar\alpha_t)\nabla\log p(x_t)\tag{132}
+\]</span></p>
+<p><span class="math display">\[
+\therefore x_0=\frac{x_t+(1-\bar\alpha_t)\nabla\log
+p(x_t)}{\sqrt{\bar\alpha_t}}\tag{133}
+\]</span></p>
+<p>再次代入到均值<span style="color: #eb52f7"> <span class="math"><span
+class="math inline">\(\mu_q(x_t,x_0)\)</span></span> </span>：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204703788.png" srcset="/img/loading.gif" lazyload /></p>
+<p>于是近似的均值<span style="color: #4eb31c"> <span class="math"><span
+class="math inline">\(\mu_\theta(x_t,t)\)</span></span> </span>：</p>
+<p><span class="math display">\[
+\mu_\theta(x_t,t)=\frac{1}{\sqrt\alpha_t}x_t+\frac{1-\alpha_t}{\sqrt\alpha_t}s_\theta(x_t,t)\tag{143}
+\]</span></p>
+<p>那么优化项就变为：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204716491.png" srcset="/img/loading.gif" lazyload /></p>
+<p>在这里，<span class="math inline">\(s_\theta(x_t,t)\)</span>
+是一个NN用来学习预测分数函数 <span
+class="math inline">\(\nabla_{x_t}\log p(x_t)\)</span>
+,也就是在任意噪声水平 <span class="math inline">\(t\)</span> 下， <span
+class="math inline">\(x_t\)</span> 在数据空间中的梯度</p>
+<h3 id="二者联系">二者联系</h3>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204723658.png" srcset="/img/loading.gif" lazyload /></p>
+<p>可以看到，两者之间存在一个随时间变化的常数因子！分数函数衡量应该在数据空间中如何移动来最大化对数似然；</p>
+<blockquote>
+<p><span class="highlight"
+data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F12736052%2Fitems%2FWHZV587X%22%2C%22annotationKey%22%3A%22X3LSTVZJ%22%2C%22color%22%3A%22%23ff6666%22%2C%22pageLabel%22%3A%2217%22%2C%22position%22%3A%7B%22pageIndex%22%3A16%2C%22rects%22%3A%5B%5B341.366%2C297.306%2C539.996%2C307.269%5D%2C%5B72%2C285.351%2C540%2C295.314%5D%2C%5B72%2C273.395%2C290.539%2C283.358%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F12736052%2Fitems%2FJC7NRMH3%22%5D%2C%22locator%22%3A%2217%22%7D%7D"
+data-ztype="zhighlight"><a href="zotero://open-pdf/library/items/WHZV587X?page=17&#x26;annotation=X3LSTVZJ">“intuitively,
+since the source noise is added to a natural image to corrupt it, moving
+in its opposite direction "denoises" the image and would be the best
+update to increase the subsequent log probability.”</a></span> <span
+class="citation"
+data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F12736052%2Fitems%2FJC7NRMH3%22%5D%2C%22locator%22%3A%2217%22%7D%5D%2C%22properties%22%3A%7B%7D%7D"
+data-ztype="zcitation">(<span
+class="citation-item"><a href="zotero://select/library/items/JC7NRMH3">Luo,
+2022, p. 17</a></span>)</span>
+🔤直观上，由于源噪声被添加到自然图像中以破坏它，因此沿其相反方向移动会对图像进行“去噪”，并且将是增加后续对数概率的最佳更新。🔤</p>
+</blockquote>
+<p>于是，学习建模分数函数就等价于建模原噪声的负值(乘上一个比例因子)</p>
+<p>因此，我们有三种等价目标：预测原始图像 <span
+class="math inline">\(x_0\)</span> 、源噪声 <span
+class="math inline">\(\epsilon_0\)</span> 、任意噪声水平时的图像的分数
+<span class="math inline">\(\nabla\log p(x_0)\)</span></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Diffusion/" class="print-no-link">#Diffusion</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Understanding Diﬀusion Models</div>
+      <div>http://example.com/2023/11/13/Understanding diffusion/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>SummerRain</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年11月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/11/28/ELITE/" title="ELITE">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">ELITE</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/11/13/IR-SDE/" title="IR-SDE">
+                        <span class="hidden-mobile">IR-SDE</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

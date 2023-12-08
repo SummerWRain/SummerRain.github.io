@@ -1,0 +1,934 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/about.png">
+  <link rel="icon" href="/img/about.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="SummerRain">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="基于分数的生成模型 基于能量的模型 任意分布都可以被写为： \[ p_\theta(x)&#x3D;\frac{1}{Z_\theta}e^{-f_\theta(x)}\tag{152} \] \(f_\theta(x)\) 是一个任意的、参数化的函数——能量函数，通常被建模为一个NN，\(Z_\theta\) 是正则化常数使得 \(\int p_\theta(x)dx&#x3D;1\) ,如果使用最大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于分数的生成模型">
+<meta property="og:url" content="http://example.com/2023/11/12/Understanding%20diffusion%E5%9F%BA%E4%BA%8E%E5%88%86%E6%95%B0%E7%9A%84%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="SummerRain">
+<meta property="og:description" content="基于分数的生成模型 基于能量的模型 任意分布都可以被写为： \[ p_\theta(x)&#x3D;\frac{1}{Z_\theta}e^{-f_\theta(x)}\tag{152} \] \(f_\theta(x)\) 是一个任意的、参数化的函数——能量函数，通常被建模为一个NN，\(Z_\theta\) 是正则化常数使得 \(\int p_\theta(x)dx&#x3D;1\) ,如果使用最大">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-12T14:59:51.000Z">
+<meta property="article:modified_time" content="2023-12-08T13:43:22.482Z">
+<meta property="article:author" content="SummerRain">
+<meta property="article:tag" content="Diffusion">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>基于分数的生成模型 - SummerRain</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.6","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>SummerRain</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="基于分数的生成模型"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-11-12 22:59" pubdate>
+          2023年11月12日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          11 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">基于分数的生成模型</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="基于分数的生成模型">基于分数的生成模型</h1>
+<h2 id="基于能量的模型">基于能量的模型</h2>
+<p>任意分布都可以被写为： <span class="math display">\[
+p_\theta(x)=\frac{1}{Z_\theta}e^{-f_\theta(x)}\tag{152}
+\]</span></p>
+<p><span class="math inline">\(f_\theta(x)\)</span>
+是一个任意的、参数化的函数——能量函数，通常被建模为一个NN，<span
+class="math inline">\(Z_\theta\)</span> 是正则化常数使得 <span
+class="math inline">\(\int p_\theta(x)dx=1\)</span>
+,如果使用最大似然估计，对复杂的 <span
+class="math inline">\(f_\theta(x)\)</span> 来说，<span
+class="math inline">\(Z_\theta\)</span> 可能难以处理</p>
+<h2 id="分数模型">分数模型</h2>
+<p>上面的问题可以使用一个NN <span
+class="math inline">\(s_\theta(x)\)</span> 来学习 <span
+class="math inline">\(p(x)\)</span> 的分数函数 <span
+class="math inline">\(\nabla\log p(x)\)</span> 所避免。动机：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207200915631.png" srcset="/img/loading.gif" lazyload /></p>
+<p>因此不需要表示任何正则化常数，分数模型可以通过最小化Fisher散度来优化：</p>
+<p><span class="math display">\[
+\mathbb E_{p(x)}\Big[\left\|s_\theta(x)-\nabla\log
+p(x)\right\|_2^2\Big]\tag{157}
+\]</span> 对于每个 <span class="math inline">\(x\)</span>
+来说，它的对数似然的梯度根本上描述了在数据空间中进一步增加它的对数似然的方向。直觉上，分数函数在数据
+x 所在的整个空间上定义了一个向量场，指向众数：</p>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207200928758.png" srcset="/img/loading.gif" lazyload /></p>
+<p>通过学习真实数据分布的分数函数，我们可以从相同空间中的任一点开始，逐渐地跟随分数直到模式到达来生成样本。采样过程为已知的郎之万采样：
+<span class="math display">\[
+x_{i+1}\gets x_i+c\nabla\log p(x_i)+\sqrt{2c}\epsilon,\
+i=0,1,...,K\tag{158}
+\]</span> <span class="math inline">\(x_0\)</span>
+是从先验分布中随机采样，<span class="math inline">\(\epsilon\sim\mathcal
+N(\epsilon;\mathbf 0,\mathbf I)\)</span>
+是一个额外的噪声项用来保证生成样本不总是崩溃到一个模式，而是为了多样性环绕在它周围，保留一定的随机性。由于ground-truth分数函数对于复杂分布的自然图像来说不可获取，于是使用分数匹配方法来解决。</p>
+<p>普通分数匹配存在三个问题：</p>
+<ol type="1">
+<li><p>当 <span class="math inline">\(x\)</span>
+在高维空间的低维流形上时，分数函数是不明确的。所有不在低维流形的点的概率为0，此时对数没有定义，而自然图像通常在整个环境空间的低维流形上</p></li>
+<li><p>通过普通分数匹配训练的分数函数在低密度区域可能是不正确的，因为我们最小化的目标是关于
+<span class="math inline">\(p(x)\)</span>
+的期望，从它的样本中训练，模型无法接收到很少见或者看不到的样本的正确的学习信号。（采样策略是高维空间的随机位置开始，很可能是随机噪声）</p></li>
+<li><p>郎之万动力采样可能不会拟合，即使使用ground-truth分数：</p>
+<blockquote>
+<p>假设真实数据分布是两个不相交的分布的混合 <span
+class="math display">\[
+p(x)=c_1p_1(x)+c_2p_2(x)\tag{159}
+\]</span>
+在计算分数时，它们的混合系数被丢掉，那么从它们中间的初始点使用郎之万动力学采样的话，到达它们每个模式的机会都是粗略相等的，尽管可能某一个分布的权重更大</p>
+</blockquote>
+<p><img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207200936664.png" srcset="/img/loading.gif" lazyload /></p>
+<p><strong>解决方案</strong>：在数据中加入多个水平的高斯噪声(去噪分数匹配)</p>
+<ol type="1">
+<li>由于高斯噪声的假设是整个空间，于是扰动后的数据不再局限于低维流形</li>
+<li>加入较大的高斯噪声将增大每种模式在数据分布中覆盖的面积，在低密度区域增加了更多训练信号</li>
+<li>加入多个水平的高斯噪声并增加方差将使得结果的中间分布尊重ground-truth的混合系数</li>
+</ol>
+<p>于是，形式上，选择正的噪声水平序列 <span
+class="math inline">\(\{\sigma_t\}_{t=1}^T\)</span>
+，以及定义一个逐渐扰动数据分布的序列： <span class="math display">\[
+p_{\sigma_t}(x_t)=\int p(x)\mathcal N(x_t;x,\sigma_t^2\mathbf
+I)dx\tag{160}
+\]</span> <span class="math inline">\(s_\theta(x,t)\)</span>
+使用<strong>分数匹配</strong>训练学习同时所有噪声水平的分数函数： <span
+class="math display">\[
+\underset{\theta}{arg\ min}\sum_{t=1}^T\lambda(t)\mathbb
+E_{p_{\sigma_t}(x_t)}\Big[\left\|s_\theta(x,t)-\nabla\log
+p_{\sigma_t}(x_t)\right\|_2^2\Big]\tag{161}
+\]</span></p></li>
+</ol>
+<p><span class="math inline">\(\lambda(t)\)</span>
+是正的权重函数，通常被选择为 <span
+class="math inline">\(\lambda(i)=\sigma_i^2\)</span>
+由于噪声水平随着时间稳定下降，因此要随着时间减少步长，使得样本最后集中在真实的模式上。
+<span class="math display">\[
+\nabla_{x_t}\log p_{\sigma_t}(x_t)=\nabla_{x_t}\log
+p_{\sigma_t}(x_t|x)p(x)=\nabla_{x_t}\log p_{\sigma_t}(x_t|x)\tag{162}
+\]</span></p>
+<p><span class="math display">\[
+\nabla_{x_t}\log p_{\sigma_t}(x_t|x)=\nabla_{x_t}\log
+\Big\{\frac{1}{\sqrt{2\pi}\sigma_t}\exp\Big(-\frac{(x_t-x)^2}{2\sigma_t^2}\Big)\Big\}\\
+=\nabla_{x_t}\Big[-\frac{(x_t-x)^2}{2\sigma_t^2}\Big]\\
+=-\frac{x_t-x}{\sigma_t^2}\\
+=-\frac{\epsilon}{\sigma_t}\tag{163}
+\]</span> 于是优化目标可以写为： <span class="math display">\[
+\underset{\theta}{arg\ min}\sum_{t=1}^{T}\lambda(t)\mathbb
+E_{p_{\sigma_t}(x_t)}\Bigg[\left\|s_\theta(x,t)+\frac{x_t-x}{\sigma_t^2}\right\|_2^2\Bigg]\\
+=\underset{\theta}{arg\ min}\sum_{t=1}^{T}\mathbb
+E_{p_{\sigma_t}(x_t)}\Big[\left\|\sigma_ts_\theta(x,t)+\epsilon\right\|_2^2\Big]\tag{164}
+\]</span></p>
+<h2 id="sde推导">SDE推导</h2>
+<p>众所周知，扩散模型中 <span class="math inline">\(x_0\to x_T,x_T\to
+x_0\)</span> 的过程一种随机过程，于是考虑使用随机微分方程（Stochastic
+Differential Equations，SDE）来刻画。</p>
+<p>原始扩散过程为离散形式，使用SDE进行连续的描述，于是前向扩散过程可以看作一个伊藤扩散过程的解：
+<span class="math display">\[
+dx=f(x,t)dx+g(t)d\omega
+\]</span> 其中： <span class="math display">\[
+dx=\lim\limits_{\Delta t\to0}(x_{t+\Delta t}-x_t)
+\]</span> 因此原来离散形式的 <span class="math inline">\(x_t\to
+x_{t+1}\)</span> 就变为连续形式的 <span class="math inline">\(x_{t}\to
+x_{t+\Delta t}\)</span> ，于是： <span class="math display">\[
+x_{t+\Delta t}=x_t+\underset{确定部分}{f(x,t)\Delta
+t}+\underset{随机部分}{g(t)\sqrt{\Delta t}\epsilon},\epsilon\sim\mathcal
+N(0,I)
+\]</span> 原来离散的前向过程：<span class="math inline">\(x_0\to x_1\to
+x_2\to ...\to x_T\)</span> ，现在连续的前向过程：<span
+class="math inline">\(x_0\to x_{\Delta t}\to x_{2\Delta t}\to ... \to
+x_T\)</span></p>
+<p>有了前向过程的SDE后，需要分析反向过程以还原真实分布， <span
+class="math display">\[
+p(x_{t+\Delta t}|x_t)=\mathcal N(x_{t+\Delta t};x_t+f(x,t)\Delta
+t,g^2(t)\Delta tI)\\
+\propto\exp(\frac{\left\|x_{t+\Delta t}-x_t-f(x,t)\Delta
+t\right\|^2}{2g^2(t)\Delta t})
+\]</span> 根据贝叶斯规则： <span class="math display">\[
+p(x_t|x_{t+\Delta t})=\frac{p(x_{t+\Delta t}|x_t)p(x_t)}{p(x_{t+\Delta
+t})}\\
+=p(x_{t+\Delta t}|x_t)\exp(\log p(x_t)-\log p(x_{t+\Delta t}))\\
+=\exp(-\frac{\left\|x_{t+\Delta t}-x_t-f(x,t)\Delta
+t\right\|^2}{2g^2(t)\Delta t}+\log p(x_t)-\log p(x_{t+\Delta
+t}))\label{6}
+\]</span> 对 <span class="math inline">\(\log p(x_{t+\Delta t})\)</span>
+进行泰勒展开： <span class="math display">\[
+\log p(x_{t+\Delta t})\approx \log p(x_t)+(x_{t+\Delta
+t}-x_t)\nabla_{x_t}\log p(x_t)+\Delta t\frac{\partial \log
+p(x_t)}{\partial t}\label{7}
+\]</span> 将公式<span
+class="math inline">\(\eqref7\)</span>代入公式<span
+class="math inline">\(\eqref6\)</span>得： <span class="math display">\[
+p(x_t|x_{t+\Delta t})\propto \exp(-\frac{\left\|x_{t+\Delta
+t}-x_t-f(x,t)\Delta t\right\|^2}{2g^2(t)\Delta t}+(x_{t+\Delta
+t}-x_t)\nabla_{x_t}\log p(x_t)-\Delta t\frac{\partial \log
+p(x_t)}{\partial t})\\
+=\exp(-\frac{\left\|x_{t+\Delta t}-x_t-[f(x,t)-g^2(t)\nabla_{x_t}\log
+p(x_t)]\Delta t\right\|^2}{2g^2(t)\Delta t}+\mathscr Ot)
+\]</span> 当 <span class="math inline">\(\Delta t\to0\)</span> 时，<span
+class="math inline">\(\mathscr Ot\to0\)</span> ，于是： <span
+class="math display">\[
+p(x_t|x_{t+\Delta t})\propto \exp(-\frac{\left\|x_{t+\Delta
+t}-x_t-[f(x,t)-g^2(t)\nabla_{x_t}\log p(x_t)]\Delta
+t\right\|^2}{2g^2(t)\Delta t})\\
+\approx \exp(-\frac{\left\|x_t-x_{t+\Delta t}+[f(x,t+\Delta
+t)-g^2(t+\Delta t)\nabla_{x_{t+\Delta t}}\log p(x_{t+\Delta t})]\Delta
+t\right\|^2}{2g^2(t+\Delta t)\Delta t})
+\]</span> 因此： <span class="math display">\[
+p(x_t|x_{t+\Delta t})=\mathcal N(x_t;x_{t+\Delta t}-[f(x,t+\Delta
+t)-g^2(t+\Delta t)\nabla_{x_{t+\Delta t}}\log p(x_{t+\Delta t})]\Delta
+t,g^2(t+\Delta t)\Delta tI)
+\]</span> 取 <span class="math inline">\(\Delta t\to0\)</span> ，以及
+<span class="math inline">\(dx=\lim\limits_{\Delta t\to0}(x_{t+\Delta
+t}-x_t)\)</span> 得最后的==reverse-time SDE==： <span
+class="math display">\[
+dx=[f(x,t)-g^2(t)\nabla_x\log p_t(x)]dt+g(t)d\omega
+\]</span> <img
+src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207200945593.png" srcset="/img/loading.gif" lazyload /></p>
+<h3 id="ve-sde-vs.-vp-sde">VE-SDE vs. VP-SDE</h3>
+<p>将NCSN以及DDPM均考虑到SDE框架中，分别为Variance Exploding(VE)
+SDE和Variance Preserving(VP) SDE。</p>
+<h4 id="ve-sde">VE-SDE</h4>
+<p>对于NCSN，扩散公式为： <span class="math display">\[
+x_T=x_0+\sigma_T\varepsilon
+\]</span> 依靠非常大的 <span class="math inline">\(\sigma_T\)</span>
+使得 <span class="math inline">\(x_T\)</span> 变为以 <span
+class="math inline">\(\epsilon\)</span> 主导的高斯噪声，因此是Variance
+Exploding（方差爆炸）。</p>
+<p>NCSN每一步的扰动核 <span
+class="math inline">\(p_{\sigma_i}(x|x_0)\)</span> 的马尔科夫链表示：
+<span class="math display">\[
+x_i=x_{i-1}+\sqrt{\sigma_i^2-\sigma_{i-1}^2}z_{i-1},i=1,...,N
+\]</span> 这里的 <span class="math inline">\(z_{i-1}\sim\mathcal
+N(0,I)\)</span> ,当 <span class="math inline">\(N\to\infty\)</span>
+时，马尔科夫链 <span class="math inline">\(\{x_i\}_{i=1}^N\)</span>
+就变成了连续的随机过程 <span
+class="math inline">\(\{x(t)\}_{t=0}^1\)</span> ,<span
+class="math inline">\(\{\sigma_i\}_{i=1}^N\)</span> 变为函数 <span
+class="math inline">\(\sigma(t)\)</span> , <span
+class="math inline">\(z_i\)</span> 变为 <span
+class="math inline">\(z(t)\)</span> , 这里的连续时间变量 <span
+class="math inline">\(t\in [0,1]\)</span> , 而不是整数 <span
+class="math inline">\(i\in \{1,2,...,N\}\)</span>. 令 <span
+class="math inline">\(x(\frac{i}{N})=x_i,\sigma(\frac{i}{N})=\sigma_i,z(\frac{i}{N})=z_i\)</span>
+, 于是 <span class="math inline">\(\Delta
+t=\frac1N,t\in\{0,\frac1N,...,\frac{N-1}{N}\}\)</span> : <span
+class="math display">\[
+x(t+\Delta t)=x(t)+\sqrt{\sigma^2(t+\Delta t)-\sigma^2(t)}z(t)\\
+=x(t+\sqrt{\frac{\sigma^2(t+\Delta t)^2-\sigma^2(t)}{\Delta
+t}}\sqrt{\Delta t}z(t)\\
+=x(t)+\sqrt{\frac{\Delta\sigma^2}{\Delta t}}\sqrt{\Delta t}z(t)
+\]</span> 于是当 <span class="math inline">\(\Delta t\to0\)</span> 时：
+<span class="math display">\[
+f(x,t)=0,g(t)=\sqrt{\frac{d(\sigma_t^2)}{dt}}
+\]</span> 于是VE-SDE为： <span class="math display">\[
+dx=\sqrt{\frac{d(\sigma_t^2)}{dt}}d\omega
+\]</span></p>
+<h4 id="vp-sde">VP-SDE</h4>
+<p>对于DDPM，扩散公式为： <span class="math display">\[
+x_T=\sqrt{\bar\alpha_T}x_0+\sqrt{1-\bar\alpha_T}\varepsilon
+\]</span> 依靠非常小的 <span
+class="math inline">\(\sqrt{\bar\alpha_T}\)</span> 去压制 <span
+class="math inline">\(x_0\)</span> ，而本身方差 <span
+class="math inline">\(\sqrt{1-\bar\alpha_T}\)</span>
+并不大，因此是Variance Preserving（方差缩紧）。</p>
+<p>DDPM的扰动核 <span
+class="math inline">\(\{p_{\alpha_i}(x|x_0)\}_{i=1}^N\)</span> ,
+它的离散化的马尔科夫链表示： <span class="math display">\[
+x_i=\sqrt{1-\beta_i}x_{i-1}+\sqrt{\beta_i}z_{i-1},i=1,2,...,N
+\]</span> 这里 <span class="math inline">\(z_{i-1}\sim\mathcal
+N(0,I)\)</span> , 为了获得当 <span class="math inline">\(n\to
+\infty\)</span> 时的马尔科夫链的极限，定义一个噪声的辅助集合 <span
+class="math inline">\(\{\bar\beta_i=N\beta_i\}_{i=1}^N\)</span> ,于是：
+<span class="math display">\[
+x_i=\sqrt{1-\frac{\bar\beta_i}{N}}x_{i-1}+\sqrt{\frac{\bar\beta_i}{N}}z_{i-1},i=1,2,...,N
+\]</span> 当 <span class="math inline">\(N\to \infty\)</span>
+时，同上，得： <span class="math display">\[
+x(t+\Delta t)=\sqrt{1-\beta(t+\Delta t)\Delta t}\
+x(t)+\sqrt{\beta(t+\Delta t)\Delta t}\ z(t)\\
+\approx (1-\frac12\beta(t+\Delta t)\Delta t)x(t)+\sqrt{\beta(t+\Delta
+t)\Delta t}\ z(t)\\
+\approx (1-\frac12\beta(t)\Delta t)x(t)+\sqrt{\beta(t)\Delta t}\ z(t)
+\]</span> 于是当 <span class="math inline">\(\Delta t\to 0\)</span> 时：
+<span class="math display">\[
+f(x,t)=-\frac12\beta(t)x(t),g(t)=\sqrt{\beta(t)}
+\]</span> 于是VP-SDE为： <span class="math display">\[
+dx=-\frac12\beta(t)xdt+\sqrt{\beta(t)}d\omega
+\]</span></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Diffusion/" class="print-no-link">#Diffusion</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>基于分数的生成模型</div>
+      <div>http://example.com/2023/11/12/Understanding diffusion基于分数的模型/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>SummerRain</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年11月12日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/11/13/IR-SDE/" title="IR-SDE">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">IR-SDE</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
