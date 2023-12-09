@@ -16,18 +16,20 @@
   <meta name="author" content="SummerRain">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Tackling the Generative Learning Trilemma with Denoising Diffusion GANs 背景 生成式学习三困境：高质量采样，多样性，快速采样  传统扩散每一步的高斯假设只在去噪步长非常小的时候成立，因此反向过程需要很多步，而反向过程中步长较大（更少的去噪步数）时，需要使用非高斯多峰分布来建模去噪分布。 贡献  将扩散模型缓慢采">
+    <meta name="description" content="Tackling the Generative Learning Trilemma with Denoising Diffusion GANs 背景 生成式学习三困境：高质量采样，多样性，快速采样  传统扩散每一步的高斯假设只在去噪步长非常小的时候成立，因此反向过程需要很多步，而反向过程中步长较大（更少的去噪步数）时，需要使用非高斯多峰分布来建模去噪分布。 贡献  将扩散模型缓慢采样的原因归结为去">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Diffusion GAN">
 <meta property="og:url" content="http://example.com/2023/12/05/Diffusion%20GAN/index.html">
 <meta property="og:site_name" content="SummerRain">
-<meta property="og:description" content="Tackling the Generative Learning Trilemma with Denoising Diffusion GANs 背景 生成式学习三困境：高质量采样，多样性，快速采样  传统扩散每一步的高斯假设只在去噪步长非常小的时候成立，因此反向过程需要很多步，而反向过程中步长较大（更少的去噪步数）时，需要使用非高斯多峰分布来建模去噪分布。 贡献  将扩散模型缓慢采">
+<meta property="og:description" content="Tackling the Generative Learning Trilemma with Denoising Diffusion GANs 背景 生成式学习三困境：高质量采样，多样性，快速采样  传统扩散每一步的高斯假设只在去噪步长非常小的时候成立，因此反向过程需要很多步，而反向过程中步长较大（更少的去噪步数）时，需要使用非高斯多峰分布来建模去噪分布。 贡献  将扩散模型缓慢采样的原因归结为去">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207203928494.png">
 <meta property="article:published_time" content="2023-12-05T15:45:51.000Z">
-<meta property="article:modified_time" content="2023-12-09T08:00:30.316Z">
+<meta property="article:modified_time" content="2023-12-09T08:57:34.921Z">
 <meta property="article:author" content="SummerRain">
 <meta property="article:tag" content="Diffusion">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207203928494.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -44,6 +46,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
 
 
 
@@ -262,7 +266,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          153 字
+          155 字
         
       </span>
     
@@ -323,21 +327,19 @@
             
               <div class="markdown-body">
                 
-                <h1
-id="tackling-the-generative-learning-trilemma-with-denoising-diffusion-gans">Tackling
-the Generative Learning Trilemma with Denoising Diffusion GANs</h1>
+                <h1>Tackling the Generative Learning Trilemma with Denoising Diffusion GANs</h1>
 <h2 id="背景">背景</h2>
 <p>生成式学习三困境：高质量采样，多样性，快速采样</p>
-<p><img
-src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207203928494.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207203928494.png" srcset="/img/loading.gif" lazyload alt=""></p>
 <p>传统扩散每一步的高斯假设只在去噪步长非常小的时候成立，因此反向过程需要很多步，而反向过程中步长较大（更少的去噪步数）时，需要使用非高斯多峰分布来建模去噪分布。</p>
 <h2 id="贡献">贡献</h2>
-<ol type="1">
+<ol>
 <li>将扩散模型缓慢采样的原因归结为去噪分布的高斯假设，并提出使用复杂、多模的去噪分布</li>
-<li>提出 Denoising Diffusion GANs，使用 conditional
-GANs参数化扩散模型的反向过程</li>
+<li>提出 Denoising Diffusion GANs，使用 conditional GANs参数化扩散模型的反向过程</li>
 </ol>
 <h2 id="方法">方法</h2>
+<h2 id="参考">参考</h2>
+<p>[1] Z. Xiao, K. Kreis, and A. Vahdat, “Tackling the Generative Learning Trilemma with Denoising Diffusion GANs.” arXiv, Apr. 04, 2022. doi: <a target="_blank" rel="noopener" href="https://doi.org/10.48550/arXiv.2112.07804">10.48550/arXiv.2112.07804</a>.</p>
 
                 
               </div>
@@ -479,7 +481,6 @@ GANs参数化扩散模型的反向过程</li>
 
   
   
-
 
 
 
@@ -674,49 +675,6 @@ GANs参数化扩散模型的反向过程</li>
 
 
   <script>Fluid.plugins.imageCaption();</script>
-
-  
-      <script>
-        if (!window.MathJax) {
-          window.MathJax = {
-            tex    : {
-              inlineMath: { '[+]': [['$', '$']] }
-            },
-            loader : {
-              load: ['ui/lazy']
-            },
-            options: {
-              renderActions: {
-                insertedScript: [200, () => {
-                  document.querySelectorAll('mjx-container').forEach(node => {
-                    let target = node.parentNode;
-                    if (target.nodeName.toLowerCase() === 'li') {
-                      target.parentNode.classList.add('has-jax');
-                    }
-                  });
-                }, '', false]
-              }
-            }
-          };
-        } else {
-          MathJax.startup.document.state(0);
-          MathJax.texReset();
-          MathJax.typeset();
-          MathJax.typesetPromise();
-        }
-
-        Fluid.events.registerRefreshCallback(function() {
-          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
-            MathJax.startup.document.state(0);
-            MathJax.texReset();
-            MathJax.typeset();
-            MathJax.typesetPromise();
-          }
-        });
-      </script>
-    
-
-  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/js/local-search.js" ></script>
 
