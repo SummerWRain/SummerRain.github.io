@@ -16,24 +16,25 @@
   <meta name="author" content="SummerRain">
   <meta name="keywords" content="">
   
-    <meta name="description" content="随机过程 Brown运动（Wiener过程） 若随机过程 \(W(t)\) 满足以下三条性质：  轨线连续 \(W(0)&#x3D;0, W(t)是关于 t 的连续函数\) 增量正态分布 对于固定 \(t\) 有 \(W(t)\sim \mathcal N(0,t)\)，以及 \(W(t)-W(s)\sim \mathcal N(0,t-s)\) 增量独立 \(W(t_n)-W(t_{n">
+    <meta name="description" content="扩散模型总结  最近在回顾之前写的Understanding Diffusion Models时，发现有个问题，文章太细了，每一步都是数学推导，于是，这篇对其进行一次总结，使得对模型理解一目了然。  前向过程 \[ q(x_t|x_{t-1})&#x3D;\mathcal N(x_t;\sqrt{\alpha_t}x_{t-1},(1-\alpha_t)I) \] \(x_0\sim q(">
 <meta property="og:type" content="article">
-<meta property="og:title" content="随机过程">
-<meta property="og:url" content="http://example.com/2023/12/07/%E9%9A%8F%E6%9C%BA%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:title" content="扩散模型总结">
+<meta property="og:url" content="http://example.com/2023/12/08/%E6%89%A9%E6%95%A3%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/index.html">
 <meta property="og:site_name" content="SummerRain">
-<meta property="og:description" content="随机过程 Brown运动（Wiener过程） 若随机过程 \(W(t)\) 满足以下三条性质：  轨线连续 \(W(0)&#x3D;0, W(t)是关于 t 的连续函数\) 增量正态分布 对于固定 \(t\) 有 \(W(t)\sim \mathcal N(0,t)\)，以及 \(W(t)-W(s)\sim \mathcal N(0,t-s)\) 增量独立 \(W(t_n)-W(t_{n">
+<meta property="og:description" content="扩散模型总结  最近在回顾之前写的Understanding Diffusion Models时，发现有个问题，文章太细了，每一步都是数学推导，于是，这篇对其进行一次总结，使得对模型理解一目了然。  前向过程 \[ q(x_t|x_{t-1})&#x3D;\mathcal N(x_t;\sqrt{\alpha_t}x_{t-1},(1-\alpha_t)I) \] \(x_0\sim q(">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-12-07T08:10:51.000Z">
-<meta property="article:modified_time" content="2023-12-08T13:43:22.562Z">
+<meta property="article:published_time" content="2023-12-08T06:01:20.000Z">
+<meta property="article:modified_time" content="2023-12-09T08:00:30.316Z">
 <meta property="article:author" content="SummerRain">
-<meta property="article:tag" content="math">
+<meta property="article:tag" content="Diffusion">
+<meta property="article:tag" content="Code">
 <meta name="twitter:card" content="summary_large_image">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>随机过程 - SummerRain</title>
+  <title>扩散模型总结 - SummerRain</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -239,7 +240,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="随机过程"></span>
+            <span id="subtitle" data-typed-text="扩散模型总结"></span>
           
         </div>
 
@@ -250,8 +251,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-12-07 16:10" pubdate>
-          2023年12月7日 下午
+        <time datetime="2023-12-08 14:01" pubdate>
+          2023年12月8日 下午
         </time>
       </span>
     
@@ -262,7 +263,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          114 字
+          71 字
         
       </span>
     
@@ -318,76 +319,45 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">随机过程</h1>
+            <h1 id="seo-header">扩散模型总结</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="随机过程">随机过程</h1>
-<h2 id="brown运动wiener过程">Brown运动（Wiener过程）</h2>
-<p>若随机过程 <span class="math inline">\(W(t)\)</span>
-满足以下三条性质：</p>
-<ol type="1">
-<li><strong>轨线连续</strong> <span class="math inline">\(W(0)=0,
-W(t)是关于 t 的连续函数\)</span></li>
-<li><strong>增量正态分布</strong> 对于固定 <span
-class="math inline">\(t\)</span> 有 <span class="math inline">\(W(t)\sim
-\mathcal N(0,t)\)</span>，以及 <span class="math inline">\(W(t)-W(s)\sim
-\mathcal N(0,t-s)\)</span></li>
-<li><strong>增量独立</strong> <span
-class="math inline">\(W(t_n)-W(t_{n-1}),...,W(t_2)-W(t_1)\)</span> 与
-<span class="math inline">\(W(t_1)\)</span> 之间相互独立</li>
-</ol>
-<p>则我们称 <span class="math inline">\(W(t)\)</span>
-为<strong>Brown运动</strong>或<strong>Wiener过程</strong></p>
-<h3 id="二次变差">二次变差</h3>
-<p><span class="math inline">\(\mathbb E[W(t)]^2=t\iff
-\int_0^t(dW)^2=\int_0^tdt\iff (dW)^2=dt\)</span></p>
+                <h1 id="扩散模型总结">扩散模型总结</h1>
 <blockquote>
-<p>proof:</p>
-<p><span
-class="math inline">\(将[0,t]划分成n份\to(0,\frac{t}{n},\frac{2n}{t},...,t),记增量\
-[W(\frac{k}{n}t)-W(\frac{k-1}{n}t)]=\Delta W(\frac{k}{n})\)</span></p>
-<p>等价于证明 <span class="math inline">\(\sum\limits_{k=1}^n[\Delta
-W(\frac{k}{n})]^2\xrightarrow[n\to\infty]{m.s}t\)</span>，即 <span
-class="math inline">\(E[\sum\limits_{k=1}^n(\Delta
-W(\frac{k}{n}))^2-t]^2\xrightarrow[n\to\infty]{m.s}0\)</span></p>
-<p><img
-src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207204826498.png" srcset="/img/loading.gif" lazyload /></p>
-<p>命题得证</p>
+<p>最近在回顾之前写的Understanding Diffusion
+Models时，发现有个问题，文章太细了，每一步都是数学推导，于是，这篇对其进行一次总结，使得对模型理解一目了然。</p>
 </blockquote>
-<h2 id="itos-formula">Ito’s formula</h2>
-<blockquote>
+<h2 id="前向过程">前向过程</h2>
 <p><span class="math display">\[
-dg(t,W(t))=\frac{\partial g}{\partial t}dt+\frac{\partial g}{\partial
-W}dW+\frac12\frac{\partial^2g}{\partial W^2}dt,\\
-because\ (dW)^2=dt.
+q(x_t|x_{t-1})=\mathcal N(x_t;\sqrt{\alpha_t}x_{t-1},(1-\alpha_t)I)
 \]</span></p>
-</blockquote>
-<h3 id="ir-sde应用">IR-SDE应用</h3>
-<p>假设一个 <span class="math inline">\(x\)</span> 是一个随机过程：
+<p><span class="math inline">\(x_0\sim q(x_0)\)</span>,<span
+class="math inline">\(\beta_1,...,\beta_T\)</span> is the variance
+schedule, <span class="math inline">\(\alpha_t=1-\beta_t\)</span><br />
 <span class="math display">\[
-dx=Fdt+Gd\omega
-\]</span> 想要估计 <span class="math inline">\(\psi(x,t)\)</span>
-,使用泰勒展开： <span class="math display">\[
-\psi(x+\Delta x,t+\Delta t)\\
-=\psi(x,t)+\frac{\partial\psi}{\partial x}\Delta
-x+\frac{\partial\psi}{\partial t}\Delta t+\\
-\frac12\big[\frac{\partial^2\psi}{\partial x^2}\Delta
-x^2+\frac{\partial^2\psi}{\partial x\partial t}\Delta t\Delta
-x+\frac{\partial^2\psi}{\partial t^2}(\Delta t)^2\big]
-\]</span> 当 <span class="math inline">\(\Delta t\to0^+\)</span> 时：
-<span class="math display">\[
-d\psi(x,t)=\frac{\partial\psi}{\partial
-x}dx+\frac{\partial\psi}{\partial
-t}dt+\frac12\frac{\partial^2\psi}{\partial x^2}dx^2\\
-=\frac{\partial\psi}{\partial t}dt+\frac{\partial\psi}{\partial
-x_t}(Fdt+Gd\omega)+\frac12\frac{\partial^2\psi}{\partial
-x^2}(Fdt+Gd\omega)^2\\
-=(\frac{\partial\psi}{\partial t}+\frac{\partial\psi}{\partial
-x_t}F+\frac12G^2\frac{\partial^2\psi}{\partial
-x^2})dt+G\frac{\partial\psi}{\partial x}d\omega
+q(x_t|x_0)=\mathcal N(x_t;\sqrt{\bar\alpha_t}x_0,(1-\bar\alpha_t)I)
+\]</span> <span
+class="math inline">\(\bar\alpha_t=\prod_{s=1}^t\alpha_s\)</span> .</p>
+<h2 id="反向过程">反向过程</h2>
+<p><span class="math display">\[
+q(x_{t-1}|x_t,x_0)=\mathcal N(x_{t-1};\mu_q(x_t,x_0),\Sigma_q(t))
 \]</span></p>
+<p><span
+class="math inline">\(\mu_q(x_t,x_0)=\frac{\sqrt\alpha_t(1-\bar\alpha_{t-1})x_t+\sqrt{\bar\alpha_{t-1}}(1-\alpha_t)x_0}{1-\bar\alpha_t}\)</span>
+<span class="math display">\[
+p_\theta(x_{t-1}|x_t)=\mathcal
+N(x_{t-1};\mu_\theta(x_t,t),\Sigma_\theta(x_t,t))
+\]</span></p>
+<h2 id="损失">损失</h2>
+<p><span class="math display">\[
+L_{simple}(\theta) = \mathbb
+E_{t,x_0,\epsilon}[\left\|\epsilon-\epsilon_\theta(x_t,t)\right\|^2]
+\]</span></p>
+<p><span class="math inline">\(x_t\sim q(x_t|x_0)\)</span></p>
+<h2 id="采样">采样</h2>
+<p>。。</p>
 
                 
               </div>
@@ -400,7 +370,9 @@ x^2})dt+G\frac{\partial\psi}{\partial x}d\omega
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/math/" class="print-no-link">#math</a>
+        <a href="/tags/Diffusion/" class="print-no-link">#Diffusion</a>
+      
+        <a href="/tags/Code/" class="print-no-link">#Code</a>
       
     </div>
   
@@ -412,8 +384,8 @@ x^2})dt+G\frac{\partial\psi}{\partial x}d\omega
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>随机过程</div>
-      <div>http://example.com/2023/12/07/随机过程/</div>
+      <div>扩散模型总结</div>
+      <div>http://example.com/2023/12/08/扩散模型总结/</div>
     </div>
     <div class="license-meta">
       
@@ -425,7 +397,7 @@ x^2})dt+G\frac{\partial\psi}{\partial x}d\omega
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年12月7日</div>
+          <div>2023年12月8日</div>
         </div>
       
       
@@ -457,18 +429,12 @@ x^2})dt+G\frac{\partial\psi}{\partial x}d\omega
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/12/08/%E6%89%A9%E6%95%A3%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/" title="扩散模型总结">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">扩散模型总结</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/12/05/Diffusion%20GAN/" title="Diffusion GAN">
-                        <span class="hidden-mobile">Diffusion GAN</span>
+                      <a href="/2023/12/07/%E9%9A%8F%E6%9C%BA%E8%BF%87%E7%A8%8B/" title="随机过程">
+                        <span class="hidden-mobile">随机过程</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

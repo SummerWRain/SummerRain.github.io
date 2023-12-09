@@ -4,6 +4,27 @@
   
   
   <entry>
+    <title>扩散模型总结</title>
+    <link href="/2023/12/08/%E6%89%A9%E6%95%A3%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/"/>
+    <url>/2023/12/08/%E6%89%A9%E6%95%A3%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/</url>
+    
+    <content type="html"><![CDATA[<h1 id="扩散模型总结">扩散模型总结</h1><blockquote><p>最近在回顾之前写的Understanding DiffusionModels时，发现有个问题，文章太细了，每一步都是数学推导，于是，这篇对其进行一次总结，使得对模型理解一目了然。</p></blockquote><h2 id="前向过程">前向过程</h2><p><span class="math display">\[q(x_t|x_{t-1})=\mathcal N(x_t;\sqrt{\alpha_t}x_{t-1},(1-\alpha_t)I)\]</span></p><p><span class="math inline">\(x_0\sim q(x_0)\)</span>,<spanclass="math inline">\(\beta_1,...,\beta_T\)</span> is the varianceschedule, <span class="math inline">\(\alpha_t=1-\beta_t\)</span><br /><span class="math display">\[q(x_t|x_0)=\mathcal N(x_t;\sqrt{\bar\alpha_t}x_0,(1-\bar\alpha_t)I)\]</span> <spanclass="math inline">\(\bar\alpha_t=\prod_{s=1}^t\alpha_s\)</span> .</p><h2 id="反向过程">反向过程</h2><p><span class="math display">\[q(x_{t-1}|x_t,x_0)=\mathcal N(x_{t-1};\mu_q(x_t,x_0),\Sigma_q(t))\]</span></p><p><spanclass="math inline">\(\mu_q(x_t,x_0)=\frac{\sqrt\alpha_t(1-\bar\alpha_{t-1})x_t+\sqrt{\bar\alpha_{t-1}}(1-\alpha_t)x_0}{1-\bar\alpha_t}\)</span><span class="math display">\[p_\theta(x_{t-1}|x_t)=\mathcalN(x_{t-1};\mu_\theta(x_t,t),\Sigma_\theta(x_t,t))\]</span></p><h2 id="损失">损失</h2><p><span class="math display">\[L_{simple}(\theta) = \mathbbE_{t,x_0,\epsilon}[\left\|\epsilon-\epsilon_\theta(x_t,t)\right\|^2]\]</span></p><p><span class="math inline">\(x_t\sim q(x_t|x_0)\)</span></p><h2 id="采样">采样</h2><p>。。</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>Diffusion</tag>
+      
+      <tag>Code</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>随机过程</title>
     <link href="/2023/12/07/%E9%9A%8F%E6%9C%BA%E8%BF%87%E7%A8%8B/"/>
     <url>/2023/12/07/%E9%9A%8F%E6%9C%BA%E8%BF%87%E7%A8%8B/</url>
@@ -27,7 +48,7 @@
     <link href="/2023/12/05/Diffusion%20GAN/"/>
     <url>/2023/12/05/Diffusion%20GAN/</url>
     
-    <content type="html"><![CDATA[<h1id="tackling-the-generative-learning-trilemma-with-denoising-diffusion-gans">Tacklingthe Generative Learning Trilemma with Denoising Diffusion GANs</h1><h2 id="背景">背景</h2><p>生成式学习三困境：高质量采样，多样性，快速采样</p><p><imgsrc="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207203928494.png" /></p><p>传统扩散每一步的高斯假设只在去噪步长非常小的时候成立，因此反向过程需要很多步，而反向过程中步长较大（更少的去噪步数）时，需要使用非高斯多峰分布来建模去噪分布。</p><h2 id="贡献">贡献</h2><ol type="1"><li>将扩散模型缓慢采样的原因归结为去噪分布的高斯假设，并提出使用复杂、多模的去噪分布</li><li>提出 Denoising Diffusion GANs，使用 conditionalGANs参数化扩散模型的反向过程</li></ol>]]></content>
+    <content type="html"><![CDATA[<h1id="tackling-the-generative-learning-trilemma-with-denoising-diffusion-gans">Tacklingthe Generative Learning Trilemma with Denoising Diffusion GANs</h1><h2 id="背景">背景</h2><p>生成式学习三困境：高质量采样，多样性，快速采样</p><p><imgsrc="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20231207203928494.png" /></p><p>传统扩散每一步的高斯假设只在去噪步长非常小的时候成立，因此反向过程需要很多步，而反向过程中步长较大（更少的去噪步数）时，需要使用非高斯多峰分布来建模去噪分布。</p><h2 id="贡献">贡献</h2><ol type="1"><li>将扩散模型缓慢采样的原因归结为去噪分布的高斯假设，并提出使用复杂、多模的去噪分布</li><li>提出 Denoising Diffusion GANs，使用 conditionalGANs参数化扩散模型的反向过程</li></ol><h2 id="方法">方法</h2>]]></content>
     
     
     
