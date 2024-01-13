@@ -4,6 +4,27 @@
   
   
   <entry>
+    <title>Refusion</title>
+    <link href="/2024/01/13/Refusion/"/>
+    <url>/2024/01/13/Refusion/</url>
+    
+    <content type="html"><![CDATA[<h1>Refusion: Enabling Large-Size Realistic Image Restoration with Latent-Space Diffusion Models</h1><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240111173646065.png" alt=""></p><blockquote><p>IR-SDE 作者在 NTIRE 2023 Shadow Removal Challenge 中提出的算法,整体比较简单,不过其中的某些超参设置,网络结构,训练策略等值得 mark 一下.</p></blockquote><h2 id="贡献">贡献</h2><p>使用 IR-SDE 作为基础，改进网络结构（NAFNet）、噪声等级、去噪步、训练图像尺寸、优化器/时间表；提出一个基于隐式扩散模型的 U-Net 结构（为了适用于大尺寸图像），在解码时保留原始输入的高分辨率信息。</p><h2 id="方法">方法</h2><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113204944117.png" alt="整体结构"></p><p>上图中，这个结构会通过 skip-connections 保留原始输入的多尺度的细节。训练时，LQ 通过编码然后解码，使用 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 损失训练，然后同样的在 HQ 上训练。</p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113210059754.png" alt=""></p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113210351846.png" alt=""></p><p>NAFNet 使用“SimpleGate” 替换所有非线性激活函数。</p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211107733.png" alt=""></p><p>改进的训练策略：</p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211044854.png" alt=""></p><h2 id="实验">实验</h2><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211535934.png" alt=""></p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211151115.png" alt=""></p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211259526.png" alt=""></p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211316532.png" alt=""></p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211734405.png" alt=""></p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211754259.png" alt=""></p><p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211809657.png" alt=""></p><h2 id="参考">参考</h2><p>[1] Z. Luo, F. K. Gustafsson, Z. Zhao, J. Sjölund, and T. B. Schön, “Refusion: Enabling Large-Size Realistic Image Restoration with Latent-Space Diffusion Models.” arXiv, Apr. 17, 2023. Accessed: Jan. 11, 2024. [Online]. Available: <a href="http://arxiv.org/abs/2304.08291">http://arxiv.org/abs/2304.08291</a></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>Diffusion</tag>
+      
+      <tag>SDE</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Diffusion GAN</title>
     <link href="/2023/12/12/Diffusion%20GAN/"/>
     <url>/2023/12/12/Diffusion%20GAN/</url>
