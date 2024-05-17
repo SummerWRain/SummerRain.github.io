@@ -16,27 +16,29 @@
   <meta name="author" content="SummerRain">
   <meta name="keywords" content="">
   
-    <meta name="description" content="CoSeR: Bridging Image and Language for Cognitive Super-Resolution">
+    <meta name="description" content="CoSeR: Bridging Image and Language for Cognitive Super-Resolution  背景  人类专家在修复 LQ 图像时往往会首先对图像有一个理解，然后才会细化图像的细节；相反，基于卷积的方法会首先集中于局部内容以及像素级的处理，因此无法理解整幅图像的上下文，无法重建严重退化但语义上很重要的细节，以及可能会造成不正确的纹理。 基于以上的观察，作者">
 <meta property="og:type" content="article">
-<meta property="og:title" content="论文速读">
-<meta property="og:url" content="https://summerwrain.github.io/2024/02/29/%E8%AE%BA%E6%96%87%E9%80%9F%E8%AF%BB/index.html">
+<meta property="og:title" content="CoSeR">
+<meta property="og:url" content="https://summerwrain.github.io/2024/04/11/CoSeR/index.html">
 <meta property="og:site_name" content="SummerRain">
-<meta property="og:description" content="CoSeR: Bridging Image and Language for Cognitive Super-Resolution">
+<meta property="og:description" content="CoSeR: Bridging Image and Language for Cognitive Super-Resolution  背景  人类专家在修复 LQ 图像时往往会首先对图像有一个理解，然后才会细化图像的细节；相反，基于卷积的方法会首先集中于局部内容以及像素级的处理，因此无法理解整幅图像的上下文，无法重建严重退化但语义上很重要的细节，以及可能会造成不正确的纹理。 基于以上的观察，作者">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240303182618760.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240303182703900.png">
-<meta property="article:published_time" content="2024-02-29T02:27:36.000Z">
-<meta property="article:modified_time" content="2024-03-05T08:55:04.863Z">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240411200258398.png">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240513202147186.png">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240423202951923.png">
+<meta property="article:published_time" content="2024-04-11T11:51:58.000Z">
+<meta property="article:modified_time" content="2024-05-17T13:34:37.415Z">
 <meta property="article:author" content="SummerRain">
-<meta property="article:tag" content="Diffusion">
+<meta property="article:tag" content="SR">
+<meta property="article:tag" content="ControlNet">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240303182618760.png">
+<meta name="twitter:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240411200258398.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>论文速读 - SummerRain</title>
+  <title>CoSeR - SummerRain</title><meta name="robots" content="noindex">
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -244,7 +246,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="论文速读"></span>
+            <span id="subtitle" data-typed-text="CoSeR"></span>
           
         </div>
 
@@ -255,8 +257,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-02-29 10:27" pubdate>
-          2024年2月29日 上午
+        <time datetime="2024-04-11 19:51" pubdate>
+          2024年4月11日 晚上
         </time>
       </span>
     
@@ -267,7 +269,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          0 字
+          234 字
         
       </span>
     
@@ -278,7 +280,7 @@
         
         
         
-          1 分钟
+          2 分钟
         
       </span>
     
@@ -323,15 +325,31 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">论文速读</h1>
+            <h1 id="seo-header">CoSeR</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="CoSeR-Bridging-Image-and-Language-for-Cognitive-Super-Resolution">CoSeR: Bridging Image and Language for Cognitive Super-Resolution</h2>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240303182618760.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240303182703900.png" srcset="/img/loading.gif" lazyload alt=""></p>
-
+                <p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240411200258398.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<h1>CoSeR: Bridging Image and Language for Cognitive Super-Resolution</h1>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240513202147186.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<h2 id="背景">背景</h2>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240423202951923.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>人类专家在修复 LQ 图像时往往会首先对图像有一个理解，然后才会细化图像的细节；相反，基于卷积的方法会首先集中于局部内容以及像素级的处理，因此无法理解整幅图像的上下文，无法重建严重退化但语义上很重要的细节，以及可能会造成不正确的纹理。</p>
+<p>基于以上的观察，作者认为需要给 SR 模型注入“认知”能力。</p>
+<h2 id="贡献">贡献</h2>
+<ul>
+<li>
+<p>本文提出的 CoSeR 使得 SR 模型能够理解 LR 图像，通过结合图像外观与语言理解来生成cognitive embedding，不仅利用了 T2I 模型的先验信息，而且生成的高质量参考图像优化 SR 过程。</p>
+</li>
+<li>
+<p>提出一个新的条件注入策略 “All-in-Attention”，将所有的条件信息合并到一个模组中</p>
+</li>
+<li>
+<p>完成了语义上正确、照片级别的细节</p>
+</li>
+</ul>
+<!-- flag of hidden posts -->
                 
               </div>
             
@@ -343,7 +361,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Diffusion/" class="print-no-link">#Diffusion</a>
+        <a href="/tags/SR/" class="print-no-link">#SR</a>
+      
+        <a href="/tags/ControlNet/" class="print-no-link">#ControlNet</a>
       
     </div>
   
@@ -355,8 +375,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>论文速读</div>
-      <div>https://summerwrain.github.io/2024/02/29/论文速读/</div>
+      <div>CoSeR</div>
+      <div>https://summerwrain.github.io/2024/04/11/CoSeR/</div>
     </div>
     <div class="license-meta">
       
@@ -368,7 +388,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年2月29日</div>
+          <div>2024年4月11日</div>
         </div>
       
       
@@ -400,21 +420,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/03/07/CCSR/" title="CCSR">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CCSR</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
-                    
-                      <a href="/2024/01/13/Refusion/" title="Refusion">
-                        <span class="hidden-mobile">Refusion</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
                     
                   </article>
                 </div>

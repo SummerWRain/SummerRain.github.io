@@ -16,39 +16,28 @@
   <meta name="author" content="SummerRain">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Refusion: Enabling Large-Size Realistic Image Restoration with Latent-Space Diffusion Models[1]   IR-SDE 作者在 NTIRE 2023 Shadow Removal Challenge 中提出的算法,整体比较简单,不过其中的某些超参设置,网络结构,训练策略等值得 mark 一下.  贡献 使用">
+    <meta name="description" content="CONTROLLING VISION-LANGUAGE MODELS FOR UNIVERSAL IMAGE RESTORATION  DA-CLIP 使用固定的 CLIP image encoder 训练了一个额外的控制器预测 HQ 特征，通过 CA 注入 IR 网络。控制器本身也会输出一个退化特征匹配真实的输入。建立了一个带有生成字幕的混合退化数据集。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Refusion">
-<meta property="og:url" content="https://summerwrain.github.io/2024/01/13/Refusion/index.html">
+<meta property="og:title" content="DA-CLIP">
+<meta property="og:url" content="https://summerwrain.github.io/2024/03/08/DA-CLIP/index.html">
 <meta property="og:site_name" content="SummerRain">
-<meta property="og:description" content="Refusion: Enabling Large-Size Realistic Image Restoration with Latent-Space Diffusion Models[1]   IR-SDE 作者在 NTIRE 2023 Shadow Removal Challenge 中提出的算法,整体比较简单,不过其中的某些超参设置,网络结构,训练策略等值得 mark 一下.  贡献 使用">
+<meta property="og:description" content="CONTROLLING VISION-LANGUAGE MODELS FOR UNIVERSAL IMAGE RESTORATION  DA-CLIP 使用固定的 CLIP image encoder 训练了一个额外的控制器预测 HQ 特征，通过 CA 注入 IR 网络。控制器本身也会输出一个退化特征匹配真实的输入。建立了一个带有生成字幕的混合退化数据集。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240111173646065.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113204944117.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113210059754.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113210351846.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211107733.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211044854.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211535934.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211151115.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211259526.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211316532.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211734405.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211754259.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211809657.png">
-<meta property="article:published_time" content="2024-01-13T13:35:14.000Z">
-<meta property="article:modified_time" content="2024-01-13T13:58:00.255Z">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240312165558378.png">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240325104709707.png">
+<meta property="article:published_time" content="2024-03-08T09:04:59.000Z">
+<meta property="article:modified_time" content="2024-05-17T13:36:02.972Z">
 <meta property="article:author" content="SummerRain">
 <meta property="article:tag" content="Diffusion">
-<meta property="article:tag" content="SDE">
+<meta property="article:tag" content="CLIP">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240111173646065.png">
+<meta name="twitter:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240312165558378.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>Refusion - SummerRain</title>
+  <title>DA-CLIP - SummerRain</title><meta name="robots" content="noindex">
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -256,7 +245,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Refusion"></span>
+            <span id="subtitle" data-typed-text="DA-CLIP"></span>
           
         </div>
 
@@ -267,8 +256,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-01-13 21:35" pubdate>
-          2024年1月13日 晚上
+        <time datetime="2024-03-08 17:04" pubdate>
+          2024年3月8日 下午
         </time>
       </span>
     
@@ -279,7 +268,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          189 字
+          67 字
         
       </span>
     
@@ -290,7 +279,7 @@
         
         
         
-          2 分钟
+          1 分钟
         
       </span>
     
@@ -335,38 +324,16 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Refusion</h1>
+            <h1 id="seo-header">DA-CLIP</h1>
             
             
               <div class="markdown-body">
                 
-                <h1>Refusion: Enabling Large-Size Realistic Image Restoration with Latent-Space Diffusion Models<sup id="fnref:1" class="footnote-ref"><a href="#fn:1" rel="footnote"><span class="hint--top hint--rounded" aria-label="Z. Luo, F. K. Gustafsson, Z. Zhao, J. Sjölund, and T. B. Schön, “Refusion: Enabling Large-Size Realistic Image Restoration with Latent-Space Diffusion Models.” arXiv, Apr. 17, 2023. Accessed: Jan. 11, 2024. [Online]. Available: http://arxiv.org/abs/2304.08291">[1]</span></a></sup></h1>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240111173646065.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<blockquote>
-<p>IR-SDE 作者在 NTIRE 2023 Shadow Removal Challenge 中提出的算法,整体比较简单,不过其中的某些超参设置,网络结构,训练策略等值得 mark 一下.</p>
-</blockquote>
-<h2 id="贡献">贡献</h2>
-<p>使用 IR-SDE 作为基础，改进网络结构（NAFNet）、噪声等级、去噪步、训练图像尺寸、优化器/时间表；提出一个基于隐式扩散模型的 U-Net 结构（为了适用于大尺寸图像），在解码时保留原始输入的高分辨率信息。</p>
-<h2 id="方法">方法</h2>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113204944117.png" srcset="/img/loading.gif" lazyload alt="整体结构"></p>
-<p>上图中，这个结构会通过 skip-connections 保留原始输入的多尺度的细节。训练时，LQ 通过编码然后解码，使用 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 损失训练，然后同样的在 HQ 上训练。</p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113210059754.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113210351846.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p>NAFNet 使用“SimpleGate” 替换所有非线性激活函数。</p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211107733.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p>改进的训练策略：</p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211044854.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<h2 id="实验">实验</h2>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211535934.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211151115.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211259526.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211316532.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211734405.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211754259.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240113211809657.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<h2 id="参考">参考</h2>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>Z. Luo, F. K. Gustafsson, Z. Zhao, J. Sjölund, and T. B. Schön, “Refusion: Enabling Large-Size Realistic Image Restoration with Latent-Space Diffusion Models.” arXiv, Apr. 17, 2023. Accessed: Jan. 11, 2024. [Online]. Available: <a target="_blank" rel="noopener" href="http://arxiv.org/abs/2304.08291">http://arxiv.org/abs/2304.08291</a>
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
+                <h1>CONTROLLING VISION-LANGUAGE MODELS FOR UNIVERSAL IMAGE RESTORATION</h1>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240312165558378.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>DA-CLIP 使用固定的 CLIP image encoder 训练了一个额外的控制器预测 HQ 特征，通过 CA 注入 IR 网络。控制器本身也会输出一个退化特征匹配真实的输入。建立了一个带有生成字幕的混合退化数据集。</p>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240325104709707.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<!-- flag of hidden posts -->
                 
               </div>
             
@@ -380,7 +347,7 @@
       
         <a href="/tags/Diffusion/" class="print-no-link">#Diffusion</a>
       
-        <a href="/tags/SDE/" class="print-no-link">#SDE</a>
+        <a href="/tags/CLIP/" class="print-no-link">#CLIP</a>
       
     </div>
   
@@ -392,8 +359,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Refusion</div>
-      <div>https://summerwrain.github.io/2024/01/13/Refusion/</div>
+      <div>DA-CLIP</div>
+      <div>https://summerwrain.github.io/2024/03/08/DA-CLIP/</div>
     </div>
     <div class="license-meta">
       
@@ -405,7 +372,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年1月13日</div>
+          <div>2024年3月8日</div>
         </div>
       
       
@@ -437,21 +404,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/03/07/CCSR/" title="CCSR">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CCSR</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
-                    
-                      <a href="/2023/12/12/Diffusion%20GAN/" title="Diffusion GAN">
-                        <span class="hidden-mobile">Diffusion GAN</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
                     
                   </article>
                 </div>
