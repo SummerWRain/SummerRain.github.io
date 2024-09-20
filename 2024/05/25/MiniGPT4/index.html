@@ -16,29 +16,32 @@
   <meta name="author" content="SummerRain">
   <meta name="keywords" content="">
   
-    <meta name="description" content="CoSeR: Bridging Image and Language for Cognitive Super-Resolution  背景  人类专家在修复 LQ 图像时往往会首先对图像有一个理解，然后才会细化图像的细节；相反，基于卷积的方法会首先集中于局部内容以及像素级的处理，因此无法理解整幅图像的上下文，无法重建严重退化但语义上很重要的细节，以及可能会造成不正确的纹理。 基于以上的观察，作者">
+    <meta name="description" content="MINIGPT-4: ENHANCING VISION-LANGUAGE UNDERSTANDING WITH ADVANCED LARGE LANGUAGE MODELS  动机：大多数GPT-4的多模态生成能力可以理解为两项基础能力图像理解以及语言生成的组合技能。以根据图像生成诗歌为例，大多数LLM已经有了很好的语言生成能力，如果它们获得了图像理解能力，即使训练数据集中没有图像-诗歌数据对，它">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CoSeR">
-<meta property="og:url" content="https://summerwrain.github.io/2024/04/11/CoSeR/index.html">
+<meta property="og:title" content="MiniGPT4">
+<meta property="og:url" content="https://summerwrain.github.io/2024/05/25/MiniGPT4/index.html">
 <meta property="og:site_name" content="SummerRain">
-<meta property="og:description" content="CoSeR: Bridging Image and Language for Cognitive Super-Resolution  背景  人类专家在修复 LQ 图像时往往会首先对图像有一个理解，然后才会细化图像的细节；相反，基于卷积的方法会首先集中于局部内容以及像素级的处理，因此无法理解整幅图像的上下文，无法重建严重退化但语义上很重要的细节，以及可能会造成不正确的纹理。 基于以上的观察，作者">
+<meta property="og:description" content="MINIGPT-4: ENHANCING VISION-LANGUAGE UNDERSTANDING WITH ADVANCED LARGE LANGUAGE MODELS  动机：大多数GPT-4的多模态生成能力可以理解为两项基础能力图像理解以及语言生成的组合技能。以根据图像生成诗歌为例，大多数LLM已经有了很好的语言生成能力，如果它们获得了图像理解能力，即使训练数据集中没有图像-诗歌数据对，它">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240411200258398.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240513202147186.png">
-<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240423202951923.png">
-<meta property="article:published_time" content="2024-04-11T11:51:58.000Z">
-<meta property="article:modified_time" content="2024-07-04T12:29:01.000Z">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522191359385.png">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522223226713.png">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522221323415.png">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522222210462.png">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522223053709.png">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522223119682.png">
+<meta property="og:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522223137507.png">
+<meta property="article:published_time" content="2024-05-25T03:51:00.000Z">
+<meta property="article:modified_time" content="2024-09-20T14:05:25.378Z">
 <meta property="article:author" content="SummerRain">
-<meta property="article:tag" content="SR">
-<meta property="article:tag" content="ControlNet">
+<meta property="article:tag" content="GPT">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240411200258398.png">
+<meta name="twitter:image" content="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522191359385.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>CoSeR - SummerRain</title>
+  <title>MiniGPT4 - SummerRain</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -246,7 +249,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CoSeR"></span>
+            <span id="subtitle" data-typed-text="MiniGPT4"></span>
           
         </div>
 
@@ -257,8 +260,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-04-11 19:51" pubdate>
-          2024年4月11日 晚上
+        <time datetime="2024-05-25 11:51" pubdate>
+          2024年5月25日 中午
         </time>
       </span>
     
@@ -269,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          234 字
+          620 字
         
       </span>
     
@@ -280,7 +283,7 @@
         
         
         
-          2 分钟
+          6 分钟
         
       </span>
     
@@ -325,30 +328,33 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CoSeR</h1>
+            <h1 id="seo-header">MiniGPT4</h1>
             
             
               <div class="markdown-body">
                 
-                <p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240411200258398.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<h1>CoSeR: Bridging Image and Language for Cognitive Super-Resolution</h1>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240513202147186.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<h2 id="背景">背景</h2>
-<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240423202951923.png" srcset="/img/loading.gif" lazyload alt=""></p>
-<p>人类专家在修复 LQ 图像时往往会首先对图像有一个理解，然后才会细化图像的细节；相反，基于卷积的方法会首先集中于局部内容以及像素级的处理，因此无法理解整幅图像的上下文，无法重建严重退化但语义上很重要的细节，以及可能会造成不正确的纹理。</p>
-<p>基于以上的观察，作者认为需要给 SR 模型注入“认知”能力。</p>
-<h2 id="贡献">贡献</h2>
-<ul>
-<li>
-<p>本文提出的 CoSeR 使得 SR 模型能够理解 LR 图像，通过结合图像外观与语言理解来生成cognitive embedding，不仅利用了 T2I 模型的先验信息，而且生成的高质量参考图像优化 SR 过程。</p>
-</li>
-<li>
-<p>提出一个新的条件注入策略 “All-in-Attention”，将所有的条件信息合并到一个模组中</p>
-</li>
-<li>
-<p>完成了语义上正确、照片级别的细节</p>
-</li>
-</ul>
+                <h1>MINIGPT-4: ENHANCING VISION-LANGUAGE UNDERSTANDING WITH ADVANCED LARGE LANGUAGE MODELS</h1>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522191359385.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>动机：大多数GPT-4的多模态生成能力可以理解为两项基础能力图像理解以及语言生成的组合技能。以根据图像生成诗歌为例，大多数LLM已经有了很好的语言生成能力，如果它们获得了图像理解能力，即使训练数据集中没有图像-诗歌数据对，它们也可以根据图像生成诗歌。</p>
+<p>提出MiniGPT-4，使用一个投影层对齐冻结的视觉编码器（BLIP-2包括基于EVA-CLIP的ViT-G/14以及一个Q-Former）编码后的视觉特征和冻结的先进的LLM（Vicuna：基于LLaMA）</p>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522223226713.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>功能：实现了大多数GPT-4所拥有的多模态能力。如：详细的图像描述生成、根据手绘草图生成网站。此外还有一些其他能力：如根据图像写故事写诗、根据图片教用户如何做菜等。</p>
+<p>初始预训练阶段在4*A100（80GB）上使用batch size为256训练20k steps，经过10个小时训练完成。使用LAION、Conceptual Captions和SBU组合的图像描述数据集对齐视觉特征和Vicuna语言模型。将投影层的输出作为LLM的“soft prompt”，提示它输出对应的GT texts。但是由于数据集中的语言风格和LLM生成风格不同，会导致产生不自然的输出，例如重复的单词或句子、支离破碎的句子或不相关的内容。</p>
+<p>受GPT-3到GPT-3.5的启发，因此在二阶段通过精心设计的交流模板制作了3500对详细的图像描述数据集，进一步微调模型，恢复LLM的生成能力，改进模型的生成可靠性以及整体的可用性。具体来说，首先进行初始的图像-文本生成对齐，使用Vicuna的交流模板设计prompt：</p>
+<blockquote>
+<p>###Human: <Img><ImageFeature></Img>Describe this image in detail. Give as many details as possible. Say everything you see. ###Assistant:</p>
+</blockquote>
+<p>为识别不完整的句子，会检查生成的句子是否超过80个token，如果没有则会添加一个额外的提示：###Human: Continue ###Assistant:提示模型延长生成过程，通过这两个步骤可以得到更全面的图像描述。然后从Conceptual Caption数据集中随机选取5000张图像生成语言描述，这些自动生成的图像描述会包含噪声或不连贯的描述，于是使用ChatGPT加入如下prompt来修复这些描述：</p>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522221323415.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>最终收集到3500个图像-文本对。在第二阶段使用模板</p>
+<blockquote>
+<p>###Human: <Img><ImageFeature></Img><Instruction>###Assistant:</p>
+</blockquote>
+<p>作为prompt训练，MiniGPT-4 现在能够产生更自然、更可靠的语言输出，整个阶段以batchsize为12训练400 steps，在单张A100上训练7分钟。</p>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522222210462.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522223053709.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522223119682.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p><img src="https://typoracc.oss-cn-beijing.aliyuncs.com/img/image-20240522223137507.png" srcset="/img/loading.gif" lazyload alt=""></p>
 
                 
               </div>
@@ -361,9 +367,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/SR/" class="print-no-link">#SR</a>
-      
-        <a href="/tags/ControlNet/" class="print-no-link">#ControlNet</a>
+        <a href="/tags/GPT/" class="print-no-link">#GPT</a>
       
     </div>
   
@@ -375,8 +379,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CoSeR</div>
-      <div>https://summerwrain.github.io/2024/04/11/CoSeR/</div>
+      <div>MiniGPT4</div>
+      <div>https://summerwrain.github.io/2024/05/25/MiniGPT4/</div>
     </div>
     <div class="license-meta">
       
@@ -388,7 +392,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年4月11日</div>
+          <div>2024年5月25日</div>
         </div>
       
       
@@ -415,6 +419,23 @@
 
 
 
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/17/CSEC/" title="CSEC">
+                        <span class="hidden-mobile">CSEC</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
               
             </div>
 
